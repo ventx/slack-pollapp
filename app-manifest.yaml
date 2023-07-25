@@ -1,0 +1,34 @@
+display_information:
+  name: PollApp
+  description: A basic polling app
+  background_color: "#737373"
+features:
+  bot_user:
+    display_name: PollApp
+    always_online: false
+  slash_commands:
+    - command: /poll
+      url: ${URL}
+      description: Initiate a poll
+      usage_hint: '"Wanna hang out?" "Maybe" "Maybe not"'
+      should_escape: false
+oauth_config:
+  scopes:
+    bot:
+      - app_mentions:read
+      - chat:write
+      - chat:write.public
+      - commands
+      - im:history
+settings:
+  event_subscriptions:
+    request_url: ${URL}
+    bot_events:
+      - app_mention
+      - message.im
+  interactivity:
+    is_enabled: true
+    request_url: ${URL}
+  org_deploy_enabled: false
+  socket_mode_enabled: false
+  token_rotation_enabled: false
