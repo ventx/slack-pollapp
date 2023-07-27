@@ -173,7 +173,7 @@ slack_secrets = json.loads(
 
 app = App(
     token=slack_secrets['SLACK_BOT_TOKEN'],
-    signing_secret=slack_secrets['SLACK_SIGNIN_SECRET'],
+    signing_secret=slack_secrets['SLACK_SIGNING_SECRET'],
     process_before_response=True
 )
 app.command(command)(ack=immediate_ack, lazy=[init_poll])

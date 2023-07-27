@@ -38,17 +38,17 @@ Install the app to a Slack workspace using an [app manifest](https://api.slack.c
 * click on _Create_
 * navigate to _Settings > Basic Information_, click on _Install to Workspace_ in the _Install your app_ section and confirm by clicking on _Allow_ in the following dialog
 
-Next put the app's _Signin Secret_ and _Bot User OAuth Token_ into the secret so that the Lambda function can authenticate with Slack:
+Next put the app's _Signing Secret_ and _Bot User OAuth Token_ into the secret so that the Lambda function can authenticate with Slack:
 * go to https://api.slack.com/apps
 * click on _Your Apps_ and select our app
-* navigate to _Settings > Basic Information_ and copy the _Signin Secret_'s value
+* navigate to _Settings > Basic Information_ and copy the _Signing Secret_'s value
 * navigate to _Features > OAuth & Permissions_ and copy the _Bot User OAuth Token_'s value
-* run `terraform output -raw set_slack_secret_command`, copy the output command, replace `<SLACK_BOT_TOKEN>` and `<SLACK_SIGNIN_SECRET>` with above's _Signin Secret_ and _Bot User OAuth Token_ so that the result looks like this
+* run `terraform output -raw set_slack_secret_command`, copy the output command, replace `<SLACK_BOT_TOKEN>` and `<SLACK_SIGNING_SECRET>` with above's _Signing Secret_ and _Bot User OAuth Token_ so that the result looks like this
 ```
 aws secretsmanager put-secret-value \
     --secret-id pollapp_slack_secrets \
-    --secret-string "{\"SLACK_BOT_TOKEN\":\"<SLACK_BOT_TOKEN>\",\"SLACK_SIGNIN_SECRET\":\"<SLACK_SIGNIN_SECRET>\"}\" \
-    --region us-east-1
+    --secret-string "{\"SLACK_BOT_TOKEN\":\"<SLACK_BOT_TOKEN>\",\"SLACK_SIGNING_SECRET\":\"<SLACK_SIGNING_SECRET>\"}\" \
+    --region us-east-1 \
     --profile default
 ```
 * run the above command

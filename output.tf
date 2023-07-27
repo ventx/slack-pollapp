@@ -1,5 +1,5 @@
 output "set_slack_secret_command" {
-  value = "aws secretsmanager put-secret-value --secret-id ${local.slack_secret_name} --secret-string \"{\\\"SLACK_BOT_TOKEN\\\":\\\"<SLACK_BOT_TOKEN>\\\",\\\"SLACK_SIGNIN_SECRET\\\":\\\"<SLACK_SIGNIN_SECRET>\\\"}\" --region ${var.aws_region} --profile ${var.aws_profile}"
+  value = "aws secretsmanager put-secret-value --secret-id ${local.slack_secret_name} --secret-string \"{\\\"SLACK_BOT_TOKEN\\\":\\\"<SLACK_BOT_TOKEN>\\\",\\\"SLACK_SIGNING_SECRET\\\":\\\"<SLACK_SIGNING_SECRET>\\\"}\" --region ${var.aws_region} --profile ${var.aws_profile}"
 }
 
 output "delete_slack_secret_command" {

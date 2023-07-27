@@ -10,7 +10,7 @@ Our app is a basic polling tool: users can initiate polls with either a [slash c
 or with an [app_mention](https://api.slack.com/events/app_mention) (These come with the added benefit of playing nice with Slack's built in [reminder](https://slack.com/resources/using-slack/how-to-use-reminders-in-slack) feature.) like `@PollApp "Skip today's daily?" "Yes" "No"`. Users may then post their votes while the poll's results are visible to channel members.
 
 
-## Prerequisites
+# Prerequisites
 Before we get started, make sure that you have:
 * a [Slack workspace](https://slack.com/create) set up
 * access to an [AWS](https://aws.amazon.com/free) account
@@ -21,10 +21,11 @@ Before we get started, make sure that you have:
     * [Docker](https://docs.docker.com/engine/install/) 
 * checked out the code that is available on [Github](https://github.com/ventx/slack-pollapp)
 
-## Slack App
+
+# Slack App
 Our app uses Slack Bolt _[a Python framework to build Slack apps in a flash with the latest platform features](https://github.com/slackapi/bolt-python)_ so that we do not have to bother with getting into the intricate details of how authentication with Slack or listening and responding to events really works.
 
-The first thing we need to do is retrieve our app's _Signin Secret_ and _Bot User OAuth Token_ from a [Secrets Manager](https://docs.aws.amazon.com/secretsmanager) secret. (We'll get to where you can find these later.) Next is to go about setting up the [App](https://slack.dev/bolt-python/api-docs/slack_bolt/app/app.html) - making sure to set `process_before_response` as per the [documentation's advice](https://slack.dev/bolt-python/concepts#lazy-listeners) for FaaS (Function-as-a-Service) environments such as AWS Lambda - and register our
+The first thing we need to do is retrieve our app's _Signing Secret_ and _Bot User OAuth Token_ from a [Secrets Manager](https://docs.aws.amazon.com/secretsmanager) secret. (We'll get to where you can find these later.) Next is to go about setting up the [App](https://slack.dev/bolt-python/api-docs/slack_bolt/app/app.html) - making sure to set `process_before_response` as per the [documentation's advice](https://slack.dev/bolt-python/concepts#lazy-listeners) for FaaS (Function-as-a-Service) environments such as AWS Lambda - and register our
 * slash command (for when our app is being invoked via a slash command), 
 * event listener (in case the app is being invoked via `app_mention`) and 
 * action listener (that is being called when a user clicks on a vote button).
@@ -48,7 +49,7 @@ def on_vote(body, respond, action):
 # instantiate app
 app = App(
     token=slack_secrets['SLACK_BOT_TOKEN'],
-    signing_secret=slack_secrets['SLACK_SIGNIN_SECRET'],
+    signing_secret=slack_secrets['SLACK_SIGNING_SECRET'],
     process_before_response=True
 )
 
@@ -224,6 +225,7 @@ def vote(poll_data: dict, user_id: str, option_id: int):
 # ...
 ```
 
+
 # Infrastructure
 For our serverless API we need
 * an API Gateway to front the previously discussed Lambda function together with a Route53 record and an ACM certificate,
@@ -241,8 +243,9 @@ Since we use Terraform to provision our infrastructure, creating all of the abov
 
 You may have to wait for the DNS record to propagate for a little while, use _nslookup_ by running the output of the `terraform output -raw check_url_command` command.
 
+
 # Installing the Slack App to your Workspace
-With the necesarry infrastructure in place we can install the app to a Slack workspace using an [app manifest](https://api.slack.com/reference/manifests) file:
+With the necessary infrastructure in place we can install the app to a Slack workspace using an [app manifest](https://api.slack.com/reference/manifests) file:
 * go to https://api.slack.com/apps
 * click on _Create New App_
 * click on _From an app manifest_ 
@@ -252,17 +255,17 @@ With the necesarry infrastructure in place we can install the app to a Slack wor
 * click on _Create_
 * navigate to _Settings > Basic Information_, click on _Install to Workspace_ in the _Install your app_ section and confirm by clicking on _Allow_ in the following dialog
 
-Next we put our app's _Signin Secret_ and _Bot User OAuth Token_ into the secret we previously mentioned so that the Lambda function can authenticate with Slack:
+Next we put our app's _Signing Secret_ and _Bot User OAuth Token_ into the secret we previously mentioned so that the Lambda function can authenticate with Slack:
 * go to https://api.slack.com/apps
 * click on _Your Apps_ and select our app
-* navigate to _Settings > Basic Information_ and copy the _Signin Secret_'s value
+* navigate to _Settings > Basic Information_ and copy the _Signing Secret_'s value
 * navigate to _Features > OAuth & Permissions_ and copy the _Bot User OAuth Token_'s value
-* run `terraform output -raw set_slack_secret_command`, copy the output command, replace `<SLACK_BOT_TOKEN>` and `<SLACK_SIGNIN_SECRET>` with above's _Signin Secret_ and _Bot User OAuth Token_ so that the result looks like this
+* run `terraform output -raw set_slack_secret_command`, copy the output command, replace `<SLACK_BOT_TOKEN>` and `<SLACK_SIGNING_SECRET>` with above's _Signing Secret_ and _Bot User OAuth Token_ so that the result looks like this
 ```
 aws secretsmanager put-secret-value \
     --secret-id pollapp_slack_secrets \
-    --secret-string "{\"SLACK_BOT_TOKEN\":\"<SLACK_BOT_TOKEN>\",\"SLACK_SIGNIN_SECRET\":\"<SLACK_SIGNIN_SECRET>\"}\" \
-    --region us-east-1
+    --secret-string "{\"SLACK_BOT_TOKEN\":\"<SLACK_BOT_TOKEN>\",\"SLACK_SIGNING_SECRET\":\"<SLACK_SIGNING_SECRET>\"}\" \
+    --region us-east-1 \
     --profile default
 ```
 * run the above command
